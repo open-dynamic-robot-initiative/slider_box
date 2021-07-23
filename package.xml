@@ -1,0 +1,19 @@
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd"
+   schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+<name>slider_box</name>
+<version>1.0.0</version>
+<description>Drivers for slider_box developed at https://github.com/open-dynamic-robot-initiative/slider_box</description>
+<maintainer email="jviereck@nyu.edu">Julian Viereck</maintainer>
+<license>BSD 3-clause</license>
+<buildtool_depend>ament_cmake</buildtool_depend>
+<!--  CMake module containing helper to find the OS, boost, python, etc.  -->
+<depend>mpi_cmake_modules</depend>
+<depend>real_time_tools</depend>
+<depend>rt</depend>
+<depend>Threads</depend>
+<test_depend>ament_cmake_gtest</test_depend>
+<export>
+<build_type>ament_cmake</build_type>
+</export>
+</package>
