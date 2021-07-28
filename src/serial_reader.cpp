@@ -79,7 +79,7 @@ SerialReader::SerialReader(const std::string &serial_port, const int &num_values
 void SerialReader::loop()
 {
     int byte_read;
-    int buffer_size = 128;
+    const int buffer_size = 128;
     char buffer[buffer_size];
     char line[buffer_size];
     int line_index = 0;
