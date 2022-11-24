@@ -8,26 +8,34 @@
  * @copyright Copyright (c) 2018
  *
  */
-
 #include "slider_box/serial_reader.hpp"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
 #include <stdexcept>
-
-#include <unistd.h>
 #include <fstream>
+#include <stdexcept>
 #include <iostream>
 
-namespace rt = real_time_tools;
+#include <fmt/format.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace slider_box
 {
 SerialReader::SerialReader(const std::string &serial_port,
                            const int &num_values)
 {
+    // initialise logger and set level
+    log_ = spdlog::get(LOGGER_NAME);
+    if (!log_)
+    {
+        log_ = spdlog::stderr_color_mt(LOGGER_NAME);
+        log_->set_level(spdlog::level::debug);
+    }
+
     std::string serial_port_try;
     for (int i = 0; i < 4; ++i)
     {
@@ -50,17 +58,15 @@ SerialReader::SerialReader(const std::string &serial_port,
         }
         else
         {
-            std::cerr << "Unable to open serial port";
+            log_->error("Unable to open serial port");
             has_error_ = true;
             return;
         }
-        std::cout << "Try to open serial port at " << serial_port_try
-                  << std::endl;
+        log_->debug("Try to open serial port at {}", serial_port_try);
         fd_ = open(serial_port_try.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
         if (fd_ != -1)
         {
-            std::cout << "Opened serial port at " << serial_port_try
-                      << std::endl;
+            log_->info("Opened serial port at {}", serial_port_try);
             break;
         }
     }

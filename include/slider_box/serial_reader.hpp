@@ -14,6 +14,8 @@
 #include <mutex>
 #include <vector>
 
+#include <spdlog/spdlog.h>
+
 #include "real_time_tools/thread.hpp"
 
 namespace slider_box
@@ -36,6 +38,8 @@ public:
      */
     int fill_vector(std::vector<int>& values);
 
+    inline static const std::string LOGGER_NAME = "SerialReader";
+
 private:
     /**
      * @brief This is the helper function used for spawning the real time
@@ -55,6 +59,8 @@ private:
      * main board.
      */
     void loop();
+
+    std::shared_ptr<spdlog::logger> log_;
 
     /**
      * @brief This boolean makes sure that the loop is stopped upon destruction
