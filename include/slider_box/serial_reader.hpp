@@ -1,10 +1,8 @@
 /**
- * \file
- * \brief Wrapper for reading new-line terminated list of values from serial
- * port.
- * \author Julian Viereck
- * \date 2020
- * \copyright Copyright (c) 2020, New York University & Max Planck Gesellschaft
+ * @file
+ * @brief Class for reading new-line terminated list of values from serial port.
+ * @author Julian Viereck
+ * @copyright Copyright (c) 2020, New York University & Max Planck Gesellschaft
  */
 #pragma once
 
@@ -23,9 +21,14 @@ namespace slider_box
 class SerialReader
 {
 public:
+    //! @brief Name of the spdlog logger used by the class.
+    inline static const std::string LOGGER_NAME = "SerialReader";
+
     /**
-     * @param serial_port The address of the serial port to use.
-     * @pparam num_values The number of values to read in each line.
+     * @param serial_port The address of the serial port to use.  Set to ""
+     *      (empty string) or "auto" to auto-detect the port.
+     * @param num_values The number of values to read in each line.
+     * @throws std::runtime_error if opening the port fails.
      */
     SerialReader(const std::string& serial_port, const int& num_values);
 
@@ -38,9 +41,18 @@ public:
      */
     int fill_vector(std::vector<int>& values);
 
-    inline static const std::string LOGGER_NAME = "SerialReader";
-
 private:
+    /**
+     * @brief Open the specified port.
+     *
+     * Sets fd_.
+     *
+     * @param port Name of the serial port.
+     *
+     * @return True on success.
+     */
+    bool open_port(const std::string& port);
+
     /**
      * @brief This is the helper function used for spawning the real time
      * thread.
@@ -89,9 +101,6 @@ private:
      */
     bool is_active_;
 
-    /**
-     *
-     */
     int new_data_counter_;
 
     int missed_data_counter_;

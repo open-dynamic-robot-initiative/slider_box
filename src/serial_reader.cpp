@@ -1,12 +1,7 @@
 /**
- * @file serial_reader.cpp
- * @author Julian Viereck
- * \brief Wrapper for reading new-line terminated list of values from serial
- * port.
- * @date 2020-01-24
- *
- * @copyright Copyright (c) 2018
- *
+ * @file
+ * @author Julian Viereck and others
+ * @copyright Copyright (c) 2020, New York University & Max Planck Gesellschaft
  */
 #include "slider_box/serial_reader.hpp"
 
@@ -15,10 +10,9 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
-#include <stdexcept>
 #include <fstream>
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
 
 #include <fmt/format.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -36,38 +30,35 @@ SerialReader::SerialReader(const std::string &serial_port,
         log_->set_level(spdlog::level::debug);
     }
 
-    std::string serial_port_try;
-    for (int i = 0; i < 4; ++i)
+    // open the serial port
+    if (serial_port.empty() || serial_port == "auto")
     {
-        // HACK: Ignore the provided serial port and
-        if (i == 0)
+        // try to auto-detect port by checking a number of potential candidates
+        bool success = false;
+        for (std::string port : {"/dev/ttyACM", "/dev/ttyACM0", "/dev/ttyACM1"})
         {
-            serial_port_try = "/dev/ttyACM";
+            log_->debug("Try to open serial port '{}'", port);
+            if (open_port(port))
+            {
+                success = true;
+                break;
+            }
         }
-        else if (i == 1)
+        if (!success)
         {
-            serial_port_try = "/dev/ttyACM0";
+            throw std::runtime_error(
+                "Unable to auto-detect serial reader port.");
         }
-        else if (i == 2)
+    }
+    else
+    {
+        // if an explicit port is specified by the user, use that one
+        if (!open_port(serial_port))
         {
-            serial_port_try = "/dev/ttyACM1";
-        }
-        else if (i == 3)
-        {
-            serial_port_try = serial_port;
-        }
-        else
-        {
-            log_->error("Unable to open serial port");
-            has_error_ = true;
-            return;
-        }
-        log_->debug("Try to open serial port at {}", serial_port_try);
-        fd_ = open(serial_port_try.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-        if (fd_ != -1)
-        {
-            log_->info("Opened serial port at {}", serial_port_try);
-            break;
+            throw std::runtime_error(
+                fmt::format("Unable to open serial reader on port '{}'. "
+                            "Set the port to 'auto' to try auto-detection.",
+                            serial_port));
         }
     }
 
@@ -96,6 +87,16 @@ SerialReader::SerialReader(const std::string &serial_port,
     is_loop_active_ = true;
     // Launch the main processing loop.
     rt_thread_.create_realtime_thread(&SerialReader::loop, this);
+}
+
+bool SerialReader::open_port(const std::string &port)
+{
+    fd_ = open(port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+    if (fd_ != -1)
+    {
+        log_->info("Opened serial port {}", port);
+    }
+    return fd_ != -1;
 }
 
 void SerialReader::loop()
