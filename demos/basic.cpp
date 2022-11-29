@@ -1,7 +1,7 @@
+#include <signal.h>
 #include <unistd.h>
 #include <cstdlib>
 #include <iostream>
-#include <signal.h>
 
 #include "real_time_tools/timer.hpp"
 
@@ -12,9 +12,10 @@ using namespace std;
 bool keep_running = true;
 
 // Define the function to be called when ctrl-c (SIGINT) is sent to process.
-void signal_callback_handler(int signum) {
-   // Terminate program
-   keep_running = false;
+void signal_callback_handler(int signum)
+{
+    // Terminate program
+    keep_running = false;
 }
 
 /**
