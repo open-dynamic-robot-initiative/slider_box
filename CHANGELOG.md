@@ -5,23 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Added
-- New features
-
 ### Changed
-- Changes in existing functionality.
+- Changed auto-detection behaviour of serial port in `SerialReader`.  The old
+  behaviour was to always first attempt to auto-detect and only consider the
+  port provided by the user if this fails.  The new behaviour depends on the
+  value of the `serial_port` argument:
 
-### Deprecated
-- for soon-to-be removed features.
-
-### Removed
-- for now removed features.
-
-### Fixed
-- Bugfixes
-
-### Security
-- in case of vulnerabilities.
+  - Empty or "auto": Try to auto-detect the port.
+  - any other value: Try to open the specified port.  Do not attempt to
+    auto-detect.
 
 
 ## [1.0.0] - 2022-11-16

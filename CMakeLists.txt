@@ -31,9 +31,15 @@ find_package(mpi_cmake_modules REQUIRED)
 find_package(real_time_tools REQUIRED)
 find_package(rt REQUIRED)
 find_package(Threads REQUIRED)
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
 
 # Export de dependencies.
-ament_export_dependencies(real_time_tools)
+ament_export_dependencies(
+    real_time_tools
+    spdlog
+    fmt
+)
 
 # Prepare the final export.
 set(all_targets)
@@ -69,8 +75,12 @@ endif()
 
 # Link the catkin dependencies.
 ament_target_dependencies(${PROJECT_NAME} rt)
-target_link_libraries(${PROJECT_NAME} real_time_tools::real_time_tools)
-target_link_libraries(${PROJECT_NAME} Threads::Threads)
+target_link_libraries(${PROJECT_NAME}
+    real_time_tools::real_time_tools
+    Threads::Threads
+    fmt::fmt
+    spdlog::spdlog
+)
 
 # If on xenomai we need to link to the real time os librairies.
 if(Xenomai_FOUND)
